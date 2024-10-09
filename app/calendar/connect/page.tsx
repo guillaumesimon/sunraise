@@ -7,24 +7,18 @@ import { supabase } from '../../../utils/supabaseClient';
 const ConnectCalendar = () => {
   const router = useRouter();
 
-//useEffect(() => {
-//     const checkUserSession = async () => {
-//       const { data: session } = await supabase.auth.getSession();
+  const connectToGoogleCalendar = async () => {
+    // Store Supabase session before redirect
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData?.session) {
+      localStorage.setItem('supabase_session', JSON.stringify(sessionData.session));
+    }
 
-//       if (!session || !session.user) {
-//         // If no user session, redirect them to login page
-//         router.push('/login');
-//       }
-//     };
-
-//     checkUserSession();
-//   }, [router]);
-
-  const connectToGoogleCalendar = () => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
     const redirectUri = `${window.location.origin}/calendar/callback`;
+    const scope = encodeURIComponent('https://www.googleapis.com/auth/calendar');
+    const googleOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&access_type=offline&prompt=consent`;
 
-    const googleOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=https://www.googleapis.com/auth/calendar&include_granted_scopes=true&prompt=consent`;
 
     // Redirect the user to Google for consent
     window.location.href = googleOAuthUrl;

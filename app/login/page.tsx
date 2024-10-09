@@ -44,6 +44,7 @@ const Login = () => {
         <Auth
           supabaseClient={supabase}
           providers={['google']} // You can add more providers if needed
+          providerScopes={'https://www.googleapis.com/auth/calendar'}
           appearance={{ theme: ThemeSupa }}
           theme="dark" // Optional, choose between 'dark' or 'light'
           redirectTo="http://localhost:3000/dashboard" // Optional, add your redirect URL after login
