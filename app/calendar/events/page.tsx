@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../utils/supabaseClient'; // Assuming supabaseClient is set up
-import { format, addMinutes } from 'date-fns'; // For date formatting
+import { format, differenceInMinutes } from 'date-fns'; // For date formatting and duration calculation
 
 const CalendarEvents = () => {
   const [events, setEvents] = useState([]);
@@ -91,6 +91,12 @@ const CalendarEvents = () => {
     }
   };
 
+  const calculateDuration = (start, end) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    return differenceInMinutes(endDate, startDate);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -120,8 +126,59 @@ const CalendarEvents = () => {
                         ? format(new Date(event.start.dateTime), 'MMMM d, yyyy h:mm aa')
                         : 'All day'}
                     </p>
+                    <p className="text-sm text-gray-500">
+                      Duration: {event.start?.dateTime && event.end?.dateTime
+                        ? `${calculateDuration(event.start.dateTime, event.end.dateTime)} minutes`
+                        : 'N/A'}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Status: {event.status || 'N/A'}
+                    </p>
                   </div>
                 </div>
+
+                {/* Organizer */}
+                {event.organizer && (
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-gray-700">
+                      Organizer: {event.organizer.displayName || event.organizer.email}
+                    </p>
+                  </div>
+                )}
+
+                {/* Conference data */}
+                {event.conferenceData && event.conferenceData.entryPoints && (
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-gray-700">Conference Link:</p>
+                    {event.conferenceData.entryPoints.map((entryPoint, idx) => (
+                      <a
+                        key={idx}
+                        href={entryPoint.uri}
+                        target="_blank"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {entryPoint.label || entryPoint.uri}
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                {/* Location */}
+                {event.location && (
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-gray-700">Location:</p>
+                    <p className="text-sm text-gray-600">{event.location}</p>
+                  </div>
+                )}
+
+                {/* Event description */}
+                {event.description && (
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-gray-700">Description:</p>
+                    <p className="text-sm text-gray-600">{event.description}</p>
+                  </div>
+                )}
+
                 {/* Display list of participants */}
                 {event.attendees && event.attendees.length > 0 && (
                   <div className="mt-2">
@@ -129,7 +186,7 @@ const CalendarEvents = () => {
                     <ul className="list-disc ml-6">
                       {event.attendees.map((attendee) => (
                         <li key={attendee.email} className="text-sm text-gray-500">
-                          {attendee.email}
+                          {attendee.displayName || attendee.email} - {attendee.responseStatus}
                         </li>
                       ))}
                     </ul>
