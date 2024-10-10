@@ -44,13 +44,14 @@ const CalendarCallback = () => {
               const { error: insertError } = await supabase
                 .from('user_tokens')
                 .upsert({
-                  user_id: user.id,
-                  access_token: accessToken,
-                  refresh_token: refreshToken, // Save refresh token if available
-                  expires_in: expiresIn,
-                  token_type: tokenType,
+                    user_id: user.id,
+                    access_token: accessToken,
+                    refresh_token: refreshToken, // Save refresh token if available
+                    expires_in: expiresIn,
+                    token_type: tokenType,
+                }, {
+                    onConflict: ['user_id'] // This tells Supabase to update on conflict of user_id
                 });
-
               if (!insertError) {
                 // Redirect to the calendar events page or another secure page
                 router.push('/calendar/events');
