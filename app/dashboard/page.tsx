@@ -46,6 +46,14 @@ const Dashboard = () => {
             Link your Google Calendar
           </a>
         </div>
+        <div className="text-center mt-10">
+        <a
+            href="/calendar/events"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition duration-300"
+          >
+            Go to Events
+          </a>
+        </div>
       </div>
     </div>
   );
